@@ -9,8 +9,7 @@ public class CodeSimulator : MonoBehaviour {
     public ActionsScript EAS;
     public ActionStates enemyCurrentAction;
     public ActionStates playerCurrentAction;
-    public Animator CodeblockUIAnimator;
-    public Animator StopAnimator;
+   
 
     private List<ActionStates> EnemyActions;
     public int OverheadActionTreshold = 5;
@@ -20,6 +19,16 @@ public class CodeSimulator : MonoBehaviour {
     public static CodeSimulator CS;
     public CodeBlockManager CBM;
     public Countdown Timer;
+
+    //Animators
+    public Animator CodeblockUIAnimator;
+    public Animator StopAnimator;
+    public Animator PlayerScriptSim;
+    public Animator EnemyScriptSim;
+
+    //Constraints
+    public CanvasGroup CodeCanvasCG;
+
     void Awake()
     {
         CS = this;
@@ -35,12 +44,13 @@ public class CodeSimulator : MonoBehaviour {
     {
         if (CBM.SimulationEnd)
         {
-
-           PrepareCodeBlocks();
+            EndCompilation();
         }
     }
-    public void StartSimulation()
+
+    public void StartCompilation()
     {
+        Timer.IsPaused = true;
       //  cbm = new CodeBlockManager();
         PlayerPoints = 0;
         EnemyPoints = 0;
@@ -50,9 +60,13 @@ public class CodeSimulator : MonoBehaviour {
         AddtoConsole("Start of Simulation");
         Debug.Log("Starting Simulation");
         if (MainHasContent()) Debug.Log("MainFunction has content"); else { Debug.Log("MainFunction has NO content"); return; }
-        // CodeblockUIAnimator.SetBool("IsOpen", false);
-        int playerActs = CBM.GetPlayerMoveCount(MainFuncContent);
-        if((playerActs - EnemyActions.Count) >= OverheadActionTreshold)
+
+       // CodeblockUIAnimator.SetBool("IsOpen", false);
+
+
+        int playerActs = CBM.GetPlayerMoveCount(MainFuncContent,0);
+        Debug.Log("Player actions:" + playerActs);
+        if ((playerActs - EnemyActions.Count) >= OverheadActionTreshold)
         {
             Debug.Log("Warning: Player have too much Overhead Actions! Please revisit your codeBlocks!");
             return;
@@ -62,17 +76,26 @@ public class CodeSimulator : MonoBehaviour {
         {
             //todo when  players action is more than enemies action
             Debug.Log("Warning: Player have MORE actions than the enemy, Overhead actions have no effect on enemies!");
-        }else if (playerActs < EnemyActions.Count)
+        }
+        else if (playerActs < EnemyActions.Count)
         {
             //todo when enemys action is less than players   action
             Debug.Log("Warning: Player have LESS actions than the enemy, Proceeding actions will be considered as IDLE!");
         }
 
+        PlayerScriptSim.SetBool("IsOpen", true);
+        CodeCanvasCG.blocksRaycasts = false;
         CBM.PlayerActions.Clear();
         CBM.CodeContainerReader(MainFuncContent);
-      
-        
+  
         //Debug.Log("LOL!");
+    }
+
+    public void EndCompilation()
+    {
+        CodeCanvasCG.blocksRaycasts = true;
+        CBM.SimulationEnd = false;
+        PrepareCodeBlocks();
     }
 
     public void PrepareCodeBlocks()
@@ -110,20 +133,19 @@ public class CodeSimulator : MonoBehaviour {
         }
 
         CodeblockUIAnimator.SetBool("IsOpen", false);
-        Timer.IsPaused = true;
-        //for (int i = 0; i < totalCount; i++)
-        //{
-        //    playerCurrentAction = CBM.PlayerActions[i];
-        //    enemyCurrentAction = EnemyActions[i];
-        //    Rules();
-        //}
-        
-        //remove comment for one by one simulation;
-        //StartCoroutine(simulation(totalCount));
+        EnemyScriptSim.SetBool("IsOpen", true);
+
+        for (int i = 0; i < totalCount; i++)
+        {
+            playerCurrentAction = CBM.PlayerActions[i];
+            enemyCurrentAction = EnemyActions[i];
+            Rules();
+        }
 
 
 
-     
+
+
     }
 
     IEnumerator simulation(int totalCount)

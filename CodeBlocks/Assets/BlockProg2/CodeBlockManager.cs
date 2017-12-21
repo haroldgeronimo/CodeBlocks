@@ -6,9 +6,11 @@ public class CodeBlockManager : MonoBehaviour
 {
     [Range(0.05f, 1)]
     public float Delay = 0.5f;
+
     public Transform pointerObj;
 
     public List<ActionStates> PlayerActions = new List<ActionStates>();
+
     public ActionStates currentEnemyAction;
   
     public Transform blockpos = null;
@@ -55,7 +57,8 @@ public class CodeBlockManager : MonoBehaviour
 
     }
 
-
+    //DON'T MESS AROUND THIS CURRENT CODE:  LAST MODIFIED DECEMBER 22, 2017 3:56 AM - IHG
+    //THE GOLDEN RECURSIVE FUNCTION THAT READS BLOCKS
     IEnumerator CodeReader(Transform content, int depth)
     {
         Debug.Log("Starting Code Reader: " + depth);
@@ -85,12 +88,12 @@ public class CodeBlockManager : MonoBehaviour
             CodeBlockMeta blockMeta = new CodeBlockMeta();
             blockMeta = currentBlock.GetComponent<CodeBlockMeta>();
 
-            Debug.Log("BlockMeta:" + block.name);
+          //  Debug.Log("BlockMeta:" + block.name);
 
             if (blockMeta == null)
             {
                 action = ActionStates.NULL;
-                Debug.Log("blockMeta is null: " + currentBlock.name);
+             //   Debug.Log("blockMeta is null: " + currentBlock.name);
 
             }
             else if (blockMeta.type == "codeblock")
@@ -106,7 +109,7 @@ public class CodeBlockManager : MonoBehaviour
                 else
                     currentEnemyAction = ActionStates.GMODE;
                 if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>() == null)
-                    Debug.Log("Cannot find enemy manager!");
+                //    Debug.Log("Cannot find enemy manager!");
 
                 blockpos = blockMeta.transform.GetChild(0);
                 yield return new WaitForSeconds(Delay);
@@ -172,7 +175,7 @@ public class CodeBlockManager : MonoBehaviour
             }
 
 
-
+     
             yield return new WaitForSeconds(Delay);
         }
 
@@ -190,7 +193,7 @@ public class CodeBlockManager : MonoBehaviour
         //Debug.Log("Ended a Code Reader" + ReaderID);
         // CodeReaderID++;
     }
-
+    //DON'T MESS AROUND THIS CURRENT CODE:  LAST MODIFIED DECEMBER 22, 2017 3:56 AM - IHG
 
     ActionStates CodeBlockReader(Transform block)
     {
@@ -218,19 +221,19 @@ public class CodeBlockManager : MonoBehaviour
             if (currentEnemyAction == blockMeta.condition)
             {
                 //     Debug.Log("Condition Returned TRUE!");
-                CodeReaderID++;
-                CodeReaders.Add(CodeReaderID);
-                CodeContainerReader(FindContentWithTag(block, "truecontent"));
-              // StartCoroutine(ContainerReader(FindContentWithTag(block, "truecontent")));
-            
+                // CodeReaderID++;
+                // CodeReaders.Add(CodeReaderID);
+              // GetPlayerMoveCount(FindContentWithTag(block, "truecontent"));
+                // StartCoroutine(ContainerReader(FindContentWithTag(block, "truecontent")));
+
                 return ActionStates.NULL;
             }
             else
             {
                 //    Debug.Log("Condition Returned FALSE!");
-                CodeReaderID++;
-                CodeReaders.Add(CodeReaderID);
-                CodeContainerReader(FindContentWithTag(block, "falsecontent"));
+                //CodeReaderID++;
+                //CodeReaders.Add(CodeReaderID);
+              // GetPlayerMoveCount(FindContentWithTag(block, "falsecontent"));
                 //StartCoroutine(ContainerReader(FindContentWithTag(block, "falsecontent")));
                 return ActionStates.NULL;
             }
@@ -248,17 +251,16 @@ public class CodeBlockManager : MonoBehaviour
             else
             {
                 //     Debug.Log("Repeat Function Repeated!");CodeReaderID++;
-                CodeReaderID++;
-                CodeReaders.Add(CodeReaderID);
-                CodeContainerReader(FindContentWithTag(block, "content"));
+                //  CodeReaderID++;
+                // CodeReaders.Add(CodeReaderID);
+                //GetPlayerMoveCount(FindContentWithTag(block, "content"));
                // StartCoroutine(ContainerReader(FindContentWithTag(block, "content")));
                 return ActionStates.SPECIAL;
             }
         }
         return ActionStates.NULL;
     }
-
-
+    
     #region OPTIONAL 
     int CodeReaderID = 0;
     List<int> CodeReaders = new List<int>();
@@ -290,9 +292,7 @@ public class CodeBlockManager : MonoBehaviour
 
     }
     #endregion
-
-
-
+    
     private void Update()
     {
         if(blockpos!=null)
@@ -303,23 +303,73 @@ public class CodeBlockManager : MonoBehaviour
         }
     }
 
-
-
-    
     #region FUNCTIONS
-
-    public int GetPlayerMoveCount(Transform content)
+    List<ActionStates> pa = new List<ActionStates>();
+    public int GetPlayerMoveCount(Transform content, int depth)
     {
-        List<ActionStates> pa = new List<ActionStates>();
-        Transform block = content.GetChild(0);
-        ActionStates action;
-        Transform currentBlock = block;
+      
+        if(depth == 0)
+        {
+            pa.Clear();
+        }
+        ActionStates action = ActionStates.NULL;
+        Transform currentBlock = content.GetChild(0);
+
         while (currentBlock != null)
         {
-            action = CodeBlockReader(currentBlock);
+           CodeBlockMeta blockMeta = currentBlock.GetComponent<CodeBlockMeta>();
+
+            if (blockMeta == null) { 
+                action = ActionStates.NULL;
+                Debug.Log("NO ACTION FOUND!");
+               
+                }
+            else if (blockMeta.type == "codeblock")
+            {
+
+
+                action =  blockMeta.act;
+            }
+            else if (blockMeta.type == "decision")
+            {
+                if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions.Count > PlayerActions.Count)
+                    currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count];
+                else
+                    currentEnemyAction = ActionStates.GMODE;
+                if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>() == null)
+                    Debug.Log("Cannot find enemy manager!");
+
+                if (currentEnemyAction == blockMeta.condition)
+                {
+                    GetPlayerMoveCount(FindContentWithTag(currentBlock, "truecontent"),depth + 1);
+
+                    action = ActionStates.NULL;
+                }
+                else
+                {
+                    GetPlayerMoveCount(FindContentWithTag(currentBlock, "falsecontent"), depth + 1);
+                    action =  ActionStates.NULL;
+                }
+            }
+            else if (blockMeta.type == "repeat")
+            {
+              bool RepStep = blockMeta.RepeatStep();
+                if (RepStep)
+                {
+                   blockMeta.RevertRepeat();
+                    action =  ActionStates.NULL;
+                }
+                else
+                {
+                    GetPlayerMoveCount(FindContentWithTag(currentBlock, "content"), depth + 1);
+                    action = ActionStates.SPECIAL;
+                }
+            }
+
+           
             if (action != ActionStates.NULL && action != ActionStates.SPECIAL)
             {
-                PlayerActions.Add(action);
+                pa.Add(action);
             }
             if (action != ActionStates.SPECIAL)
             {
@@ -329,7 +379,12 @@ public class CodeBlockManager : MonoBehaviour
 
          
         }
+
+
+        if(depth == 0)
         return pa.Count;
+
+        return 0;
     }
     Transform GetNext(Transform transform)
     {
