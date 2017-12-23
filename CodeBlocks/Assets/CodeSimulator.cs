@@ -31,6 +31,7 @@ public class CodeSimulator : MonoBehaviour
     public Animator StopAnimator;
     public Animator PlayerScriptSim;
     public Animator EnemyScriptSim;
+    public Animator ControlAnimator;
 
     //Pointers
     public Transform PlayerPointerObject;
@@ -45,6 +46,7 @@ public class CodeSimulator : MonoBehaviour
 
     //Simulation
     public FillPlayerActions fillPlayerActions;
+    public FillEnemyActions fillEnemyActions;
 
     void Awake()
     {
@@ -74,7 +76,13 @@ public class CodeSimulator : MonoBehaviour
         //  cbm = new CodeBlockManager();
         PlayerPoints = 0;
         EnemyPoints = 0;
-        EnemyActions = EAS.actions;
+        EnemyActions = new List<ActionStates>();
+        EnemyActions.Clear();
+        foreach (ActionHandler act in EAS.actions)
+        {
+            EnemyActions.Add(act.Action);
+        }
+   
         //int i = 0;
         ClearConsole();
         AddtoConsole("Start of Simulation");
@@ -109,6 +117,10 @@ public class CodeSimulator : MonoBehaviour
             //todo when enemys action is less than players   action
             Debug.Log("Warning: Player have LESS actions than the enemy, Proceeding actions will be considered as IDLE!");
         }
+
+        //Randomizes Enemy Actions
+        EAS.PrepareActions();
+        fillEnemyActions.FillOutCanvas();
 
         IsCompiling = true;
         Timer.IsPaused = true;
@@ -454,12 +466,14 @@ public class CodeSimulator : MonoBehaviour
         CodeblockUIAnimator.SetBool("IsOpen", true);
         PlayerScriptSim.SetBool("IsOpen", false);
         EnemyScriptSim.SetBool("IsOpen", false);
+        ControlAnimator.SetBool("IsOpen", true);
     }
     public void SimulateMode()
     {
         CodeblockUIAnimator.SetBool("IsOpen", false);
         PlayerScriptSim.SetBool("IsOpen", true);
         EnemyScriptSim.SetBool("IsOpen", true);
+        ControlAnimator.SetBool("IsOpen", false);
     }
     #endregion
 }

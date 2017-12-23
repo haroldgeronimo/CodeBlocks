@@ -15,20 +15,24 @@ public class FillPlayerActions : MonoBehaviour {
             GameObject.Destroy(child.gameObject);
         }
         Actions = ActSc.PlayerActions;
+        Color color;
         foreach (ActionStates action in Actions)
         {
             functionBlock.GetComponentInChildren<Text>().text = action.ToString();
             if (action.ToString() == "QUICK_ATTACK")
             {
-                functionBlock.GetComponent<Image>().color = Color.red;
+                ColorUtility.TryParseHtmlString("#FF7A7AFF", out color);
+                functionBlock.GetComponent<Image>().color = color;
             }
             else if (action.ToString() == "BLOCK")
             {
-                functionBlock.GetComponent<Image>().color = Color.blue;
+                ColorUtility.TryParseHtmlString("#7ECFFFFF", out color);
+                functionBlock.GetComponent<Image>().color = color;
             }
             else if (action.ToString() == "SPELL")
             {
-                functionBlock.GetComponent<Image>().color = Color.yellow;
+                ColorUtility.TryParseHtmlString("#EC6610FF", out color);
+                functionBlock.GetComponent<Image>().color = color;
             }
             else if (action.ToString() == "IDLE")
             {

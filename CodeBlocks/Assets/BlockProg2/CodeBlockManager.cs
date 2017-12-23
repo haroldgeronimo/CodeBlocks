@@ -107,7 +107,7 @@ public class CodeBlockManager : MonoBehaviour
             else if (blockMeta.type == "decision")
             {
                 if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions.Count > PlayerActions.Count)
-                    currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count];
+                    currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count].Action;
                 else
                     currentEnemyAction = ActionStates.GMODE;
                 if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>() == null)
@@ -216,7 +216,7 @@ public class CodeBlockManager : MonoBehaviour
         if (blockMeta.type == "decision")
         {
             if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions.Count > PlayerActions.Count)
-                currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count];
+                currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count].Action;
             else
                 currentEnemyAction = ActionStates.GMODE;
             if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>() == null)
@@ -338,7 +338,7 @@ public class CodeBlockManager : MonoBehaviour
             else if (blockMeta.type == "decision")
             {
                 if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions.Count > PlayerActions.Count)
-                    currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count];
+                    currentEnemyAction = GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>().actions[PlayerActions.Count].Action;
                 else
                     currentEnemyAction = ActionStates.GMODE;
                 if (GameObject.FindGameObjectWithTag("EM").GetComponent<ActionsScript>() == null)
