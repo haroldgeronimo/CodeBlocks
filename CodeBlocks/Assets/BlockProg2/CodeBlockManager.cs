@@ -17,6 +17,8 @@ public class CodeBlockManager : MonoBehaviour
 
     public bool SimulationEnd = false;
 
+    public FillPlayerActions fillPlayerActions;
+
     public void CodeContainerReader(Transform content)
     {
         //   Debug.Log("CodeContainer Reader Entered " + content.name);
@@ -57,7 +59,7 @@ public class CodeBlockManager : MonoBehaviour
 
     }
 
-    //DON'T MESS AROUND THIS CURRENT CODE:  LAST MODIFIED DECEMBER 22, 2017 3:56 AM - IHG
+    //DON'T MESS AROUND THIS CURRENT CODE:  LAST MODIFIED DECEMBER 23, 2017 3:37 AM - IHG
     //THE GOLDEN RECURSIVE FUNCTION THAT READS BLOCKS
     IEnumerator CodeReader(Transform content, int depth)
     {
@@ -175,7 +177,7 @@ public class CodeBlockManager : MonoBehaviour
             }
 
 
-     
+            fillPlayerActions.UpdateCanvas();
             yield return new WaitForSeconds(Delay);
         }
 
@@ -185,15 +187,18 @@ public class CodeBlockManager : MonoBehaviour
         {
             pointerObj.gameObject.SetActive(false);
             SimulationEnd = true;
+            fillPlayerActions.UpdateCanvas();   
         }
 
+
         Debug.Log("Ending Code Reader: " + depth);
+
+      
         yield return null;
 
         //Debug.Log("Ended a Code Reader" + ReaderID);
         // CodeReaderID++;
     }
-    //DON'T MESS AROUND THIS CURRENT CODE:  LAST MODIFIED DECEMBER 22, 2017 3:56 AM - IHG
 
     ActionStates CodeBlockReader(Transform block)
     {

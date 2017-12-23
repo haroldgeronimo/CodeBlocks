@@ -40,17 +40,14 @@ public class FillPlayerActions : MonoBehaviour {
         }
 
     }
-    private void Start()
+   
+    public void UpdateCanvas()
     {
-
-    }
-    // Update is called once per frame
-    void Update () {
         Actions = ActSc.PlayerActions;
-        if (Actions!=null)
-        if (Actions.Count > 0)
-        {
-            FillOutCanvas();
-        }
-	}
+        if (Actions != null)
+            if (Actions.Count > 0)
+            {
+                FillOutCanvas();
+            }
+    }
 }

@@ -9,17 +9,22 @@ public class Countdown : MonoBehaviour {
     public CodeBlockManager cbm;
     bool IsCountingDown = true;
     public bool IsPaused = false;
-    private int minutes = 0;
-    private int seconds = 0;
+    public int minutes = 0;
+    public int seconds = 0;
+
 	void Start () {
+        InitializeTimer();
+        StartCountdown();   
+
+	}
+    public void InitializeTimer()
+    {
         if (CountdownInSeconds > 59)
         {
             minutes = CountdownInSeconds / 60;
             seconds = CountdownInSeconds - (minutes * 60);
         }
-        StartCountdown();   
-
-	}
+    }
 	public void StartCountdown()
     {
         StartCoroutine(CountDownTimer());
@@ -27,12 +32,13 @@ public class Countdown : MonoBehaviour {
 	// Update is called once per frame
 	IEnumerator CountDownTimer() {
 
-        while (IsPaused)
-        {
-            yield return null;
-        }
+     
         while (IsCountingDown)
         {
+            while (IsPaused)
+            {
+                yield return null;
+            }
             seconds --;
             if (seconds <= 0 && minutes > 0)
             {
