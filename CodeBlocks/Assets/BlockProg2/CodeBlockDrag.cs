@@ -14,7 +14,11 @@ public class CodeBlockDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-
+        if (Input.touchCount > 1)
+        {
+            OnEndDrag(eventData);
+            return;
+        }
         placeholder.transform.SetSiblingIndex(this.transform.GetSiblingIndex());
         //SiblingI = this.transform.GetSiblingIndex();
         returnParent = this.transform.parent;
@@ -23,13 +27,19 @@ public class CodeBlockDrag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEn
         if (returnParent.tag == "content" || returnParent.tag == "truecontent" || returnParent.tag == "falsecontent")
                 if (returnParent.GetComponent<ContentDrop>().GetAllChild().Count <= 1)
                     returnParent.GetComponent<ContentDrop>().PlaceholdersetActive();//activates place holder when all content leaves
+ 
             this.GetComponent<CanvasGroup>().blocksRaycasts = false;
      
     }
     public void OnDrag(PointerEventData eventData)
     {
-        
-            this.transform.position = eventData.position;
+        if (Input.touchCount > 1)
+        {
+            OnEndDrag(eventData);
+            return;
+        }
+
+        this.transform.position = eventData.position;
 
             int newSbIndex = placeholderParent.childCount;
             for (int i = 0; i < placeholderParent.childCount; i++)

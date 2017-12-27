@@ -21,6 +21,9 @@ public class conditionSetter : MonoBehaviour, IPointerDownHandler
             AssignRepeat(RepeatTimes);
         else
             AssignDecision(Condition);
+
+
+        dropped = null;
     }
     public GameObject getDropped()
     {//improve this
@@ -35,6 +38,7 @@ public class conditionSetter : MonoBehaviour, IPointerDownHandler
         else { return null; }
     }
     public void AssignRepeat(int rt) {
+       
         dropped.GetComponent<CodeBlockMeta>().SetRepeatTimes(rt);
         repeats.SetBool("IsOpen", false);
     }

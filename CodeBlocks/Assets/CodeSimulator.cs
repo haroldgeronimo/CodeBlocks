@@ -48,9 +48,13 @@ public class CodeSimulator : MonoBehaviour
     public FillPlayerActions fillPlayerActions;
     public FillEnemyActions fillEnemyActions;
 
+    //Modal
+    private ModalDialogueSystem Modal;
+
     void Awake()
     {
         CS = this;
+        Modal = ModalDialogueSystem.instance();
     }
 
     private void Start()
@@ -87,7 +91,9 @@ public class CodeSimulator : MonoBehaviour
         ClearConsole();
         AddtoConsole("Start of Simulation");
         Debug.Log("Starting Simulation");
-        if (MainHasContent()) Debug.Log("MainFunction has content"); else { Debug.Log("MainFunction has NO content"); return; }
+        if (MainHasContent()) Debug.Log("MainFunction has content"); else {
+            Modal.ShowOk("Your main block is empty! Create and put your script on the main block!", () => StopAll(), "Oops!");
+            Debug.Log("MainFunction has NO content"); return; }
 
         // CodeblockUIAnimator.SetBool("IsOpen", false);
 
@@ -96,12 +102,14 @@ public class CodeSimulator : MonoBehaviour
         Debug.Log("Player actions:" + playerActs);
         if(playerActs <= 0)
         {
+            Modal.ShowOk("Your script yields no action! Revisit your Code Blocks!", () => StopAll(), "Oops!");
             Debug.Log("Warning: Player yields no actions! Revisit your codeBlocks!");
             return;
         }
 
         if ((playerActs - EnemyActions.Count) >= OverheadActionTreshold)
         {
+            Modal.ShowOk("You have too much overhead actions! Revisit your Code Blocks!",() => StopAll(),"Oops!");
             Debug.Log("Warning: Player have too much Overhead Actions! Please revisit your codeBlocks!");
             return;
         }
@@ -109,12 +117,14 @@ public class CodeSimulator : MonoBehaviour
         if (playerActs > EnemyActions.Count)
         {
             //todo when  players action is more than enemies action
+            Modal.ShowYesNo("You have MORE actions than the enemy, Overhead actions have no effect on enemies! Do you want to continue?", () => DoNothing(), () => StopAll());
             Debug.Log("Warning: Player have MORE actions than the enemy, Overhead actions have no effect on enemies!");
         }
 
         else if (playerActs < EnemyActions.Count)
         {
-            //todo when enemys action is less than players   action
+            Modal.ShowYesNo("You have LESS actions than the enemy, Proceeding actions will be considered as IDLE! Do you want to continue?", () => DoNothing(), () => StopAll());
+
             Debug.Log("Warning: Player have LESS actions than the enemy, Proceeding actions will be considered as IDLE!");
         }
 
@@ -419,7 +429,7 @@ public class CodeSimulator : MonoBehaviour
 
     public void ResetAll()
     {
-        ////
+        ////restart scene here ahahhaa
 
 
 
@@ -460,7 +470,10 @@ public class CodeSimulator : MonoBehaviour
        // Reload Scene
     }
 
+    void DoNothing() { }
+
     #region "Animations"
+
     public void DebugMode()
     {
         CodeblockUIAnimator.SetBool("IsOpen", true);
@@ -468,6 +481,7 @@ public class CodeSimulator : MonoBehaviour
         EnemyScriptSim.SetBool("IsOpen", false);
         ControlAnimator.SetBool("IsOpen", true);
     }
+
     public void SimulateMode()
     {
         CodeblockUIAnimator.SetBool("IsOpen", false);
@@ -475,5 +489,6 @@ public class CodeSimulator : MonoBehaviour
         EnemyScriptSim.SetBool("IsOpen", true);
         ControlAnimator.SetBool("IsOpen", false);
     }
+
     #endregion
 }

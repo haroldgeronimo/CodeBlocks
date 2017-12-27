@@ -20,12 +20,13 @@ public class ContentDrop : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         phDefaultSize = placeholder.GetComponent<RectTransform>().sizeDelta;
     }
     public void OnPointerEnter(PointerEventData eventData) {
-        if (eventData.pointerDrag == null) return;
+        if (eventData.pointerDrag == null) { Debug.Log("null pointer drag"); return; }
         if (eventData.pointerDrag.gameObject.tag != "decision"
         && eventData.pointerDrag.gameObject.tag != "repeat"
-        && eventData.pointerDrag.gameObject.tag != "codeblock") return;
+        && eventData.pointerDrag.gameObject.tag != "codeblock") { Debug.Log("Incorrect tag: " + eventData.pointerDrag.gameObject.tag); return; }
         if ((eventData.pointerDrag != null || eventData.pointerDrag.gameObject != this.gameObject) && eventData.pointerDrag.GetComponent<CodeBlockDrag>() != null)
         {
+            Debug.Log("codeblockdrag does not equal null"); 
             CodeBlockDrag cbd = eventData.pointerDrag.GetComponent<CodeBlockDrag>();
             if (cbd != null)
                 cbd.placeholderParent = this.transform;

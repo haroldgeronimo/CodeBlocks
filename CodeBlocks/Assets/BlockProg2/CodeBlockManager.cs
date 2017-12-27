@@ -87,7 +87,7 @@ public class CodeBlockManager : MonoBehaviour
                 blockpos = currentBlock.GetChild(0);
             }
 
-            CodeBlockMeta blockMeta = new CodeBlockMeta();
+            CodeBlockMeta blockMeta = null;
             blockMeta = currentBlock.GetComponent<CodeBlockMeta>();
 
           //  Debug.Log("BlockMeta:" + block.name);
